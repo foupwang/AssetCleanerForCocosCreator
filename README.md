@@ -39,5 +39,5 @@ node main.js -size d:\myproject\assets d:\out.txt
 原因：1）命令行可以更好的结合自动化流程；2）我喜欢Node.js的简洁轻快；
 
 备注：
-1、关于Node.js的简易教程可参考我的博客：
+1、关于Node.js的简易教程可参考我的博客：https://blog.csdn.net/foupwang/article/details/79146820
 2、欢迎关注我的微信公众号，搜索“楚游香”即可，有问题留言；
