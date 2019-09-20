@@ -10,8 +10,9 @@ Resource cleaner for CocosCreator(CocosCreator工程资源优化大师)
 
 ## 用法：
 需要安装 node.js，我的测试环境是：node.js 10.14.2 + Win10 + CocosCreator 2.1.2。
-命令格式：node main.js -clean工程资源目录 结果输出文件
-例如，我的Creator工程路径是d:\myproject，则在本脚本目录的命令行输入：
-node main.js -clean d:\myproject\assets d:\out.txt
-查找结果将会输出到D盘的 out.txt 文件中。
+###命令格式：
+`node main.js -clean工程资源目录 结果输出文件`
+例如，我的Creator工程路径是`d:\myproject`，则在脚本目录的命令行输入：
+`node main.js -clean d:\myproject\assets d:\out.txt`
+查找结果将会输出到D盘的`out.txt`文件中。
 
