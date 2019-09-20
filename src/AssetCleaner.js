@@ -1,6 +1,7 @@
 ﻿const fs = require('fs');
 const path = require('path');
-const fsUtil = require('./fsUtil');
+const FileHelper = require('./FileHelper');
+const Utils = require('./Utils');
 
 let ResType = {
     Image: 0, // 普通图片
@@ -15,39 +16,62 @@ let ResType = {
 let ResExt = [
     { name:'.plist', type:ResType.ImageAtlas },
     { name:'.labelatlas', type:ResType.LabelAtlas },
-    { name:'.json', type:ResType.Spine },
+    { name:'.json', type:ResType.Spine }, // spine和dragonBones的扩展名、查找流程一样
 ];
 
-let MainRun = {
-    sourceFile: process.argv[2],
-    destFile: process.argv[3],
+let AssetCleaner = {
     sourceMap: null,
     destMap: null,
+    handleMap: null,
 
-    start() {
+    start(sourceFile, destFile) {
+        if (!sourceFile || sourceFile.length <= 0 || !destFile || destFile.length <= 0) {
+            console.error('Cleaner: invalid source or dest');
+            return;
+        }
+
         this.sourceMap = new Map();
         this.destMap = new Map();
         this.handleMap = new Map();
 
-        // 非绝对路径则加上当前目录
-        if (!path.isAbsolute(this.sourceFile)) {
-            this.sourceFile = path.join(__dirname, this.sourceFile);
-        }
-        if (!path.isAbsolute(this.destFile)) {
-            this.destFile = path.join(__dirname, this.destFile);
-        }
+        sourceFile = FileHelper.getFullPath(sourceFile);
+        destFile = FileHelper.getFullPath(destFile);
 
-        this.traversalDir(this.sourceFile);
-        
-        let content = this.compareRes();
-
-        fsUtil.writeFile(this.destFile, content);
+        this.lookupAssetDir(sourceFile);
+        let files = this.compareAssets();
+        let outStr = this.getSortedResult(files, sourceFile);
+        FileHelper.writeFile(destFile, outStr);
     },
 
-    // UUID和文件逐个比较，如果未找到，则说明该UUID对应的文件未被引用
-    compareRes() {
-        let outStr = '未引用文件：\n';
+    getSortedResult(files, srcDir) {
+        let outStr = '未引用文件数量=' + files.length;
+        if (files.length <= 0) {
+            return outStr;
+        }
 
+        // 按从大到小排列
+        files.sort(function(a, b) {
+            return b.size - a.size;
+        });
+
+        let totalSize = 0;
+        let content = '';
+        for (let i = 0, len = files.length; i < len; i++) {
+            let file = files[i];
+            content += '空间=' + Utils.byte2KbStr(file.size) + 'KB, 文件=' + file.path + '\n';
+            totalSize += file.size;
+        }
+        outStr += ', 总空间=' + Utils.byte2MbStr(totalSize) + 'MB, 目录=' + srcDir + '\n\n';
+        outStr += content;
+
+        return outStr;
+    },
+
+    // UUID和文件逐个比较，返回结果汇总
+    compareAssets() {
+        let results = [];
+        
+        // 如果源UUID在所有目标资源都未找到，则说明源UUID对应的文件未被引用
         for (let [srcPath, srcData] of this.sourceMap.entries()) {
             let bFound = false;
             for (let [destPath, destData] of this.destMap.entries()) {
@@ -68,18 +92,18 @@ let MainRun = {
                 }
             }
 
-            srcData.refed = bFound;
             if (!bFound) {
-                outStr += 'path=' +srcPath +'\n'; 
+                results.push({ path:srcPath, size:srcData.size }); 
             }
         }
 
-        return outStr;
+        return results;
     },
 
-    traversalDir(srcDir, callback) {
+    // 递归查找指定目录下所有资源
+    lookupAssetDir(srcDir, callback) {
         if (!srcDir || !fs.existsSync(srcDir)) {    
-            console.error("invalid srcDir=" + srcDir);
+            console.error("AssetCleaner: invalid srcDir=" + srcDir);
             return;
         }
 
@@ -99,7 +123,7 @@ let MainRun = {
 
             let stats = fs.statSync(curPath);
             if (stats.isDirectory()) {
-                this.traversalDir(curPath);
+                this.lookupAssetDir(curPath);
                 continue;
             }
 
@@ -111,34 +135,35 @@ let MainRun = {
                 case '.prefab':
                     if (curPath.indexOf('\\res\\') >= 0) {
                         uuid = this.getFileUUID(curPath, pathObj, ResType.Prefab);
-                        this.sourceMap.set(curPath, { uuid });
+                        this.sourceMap.set(curPath, { uuid, size:stats.size });
                     }
-                    data = fsUtil.getFileString(curPath);
+                    data = FileHelper.getFileString(curPath);
                     this.destMap.set(curPath, { data });
                     break;
 
                 case '.anim':
                     if (curPath.indexOf('\\res\\') >= 0) {
                         uuid = this.getFileUUID(curPath, pathObj, ResType.Anim);
-                        this.sourceMap.set(curPath, { uuid });
+                        this.sourceMap.set(curPath, { uuid, size:stats.size });
                     }
-                    data = fsUtil.getFileString(curPath);
+                    data = FileHelper.getFileString(curPath);
                     this.destMap.set(curPath, { data });
                     break;
 
                 case '.fire':
-                    data = fsUtil.getFileString(curPath);
+                    data = FileHelper.getFileString(curPath);
                     this.destMap.set(curPath, { data });
                     break;
                 
                 case '.png':
                 case '.jpg':
+                case '.webp':
                     if (curPath.indexOf('\\resources\\') >= 0) {
                         break;
                     }
                     let type = this.getImageType(curPath, pathObj);
                     uuid = this.getFileUUID(curPath, pathObj, type);
-                    this.sourceMap.set(curPath, { uuid });
+                    this.sourceMap.set(curPath, { uuid, size:stats.size });
                     break;
 
                 default:
@@ -165,7 +190,7 @@ let MainRun = {
     // 获取普通图片的UUID
     getUUIDFromMeta(metaPath, sourceName) {
         let uuid = [];
-        let meta = fsUtil.getObjectFromFile(metaPath);
+        let meta = FileHelper.getObjectFromFile(metaPath);
         if (!!meta && !!meta.subMetas) {
             let obj = meta.subMetas[sourceName];
             if (!!obj && !!obj.uuid) {
@@ -179,7 +204,7 @@ let MainRun = {
     // 获取普通文件的UUID
     getRawUUIDFromMeta(metaPath) {
         let uuid = [];
-        let meta = fsUtil.getObjectFromFile(metaPath);
+        let meta = FileHelper.getObjectFromFile(metaPath);
         if (!!meta && !!meta.uuid) {
             let rawUUID = meta.uuid.substring(0);
             uuid.push(rawUUID);
@@ -190,7 +215,7 @@ let MainRun = {
     // 从Plist中获取所有碎图的uuid
     getPlistUUIDFromMeta(metaPath) {
         let uuid = [];
-        let meta = fsUtil.getObjectFromFile(metaPath);
+        let meta = FileHelper.getObjectFromFile(metaPath);
         if (!!meta && !!meta.uuid) {
             let rawUUID = meta.uuid.substring(0);
             uuid.push(rawUUID); // 记录自身ID
@@ -244,6 +269,5 @@ let MainRun = {
 
 };
 
-module.exports = MainRun;
+module.exports = AssetCleaner;
 
-MainRun.start();

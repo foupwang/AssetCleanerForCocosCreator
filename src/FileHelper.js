@@ -1,6 +1,14 @@
 ﻿const fs = require('fs');
+const path = require('path');
 
-let fsUtil = {
+let FileHelper = {
+
+    getFullPath(filePath) {
+        if (!path.isAbsolute(filePath)) {
+            filePath = path.join(__dirname, filePath); // 非绝对路径则加上当前目录
+        }
+        return filePath;
+    },
     
     // 输出到文件
     writeFile(fullPath, content) {
@@ -46,4 +54,4 @@ let fsUtil = {
 
 };
 
-module.exports = fsUtil;
+module.exports = FileHelper;
