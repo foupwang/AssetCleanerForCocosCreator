@@ -39,7 +39,7 @@ node main.js -size 工程资源目录 结果输出文件	// 按类型统计目�
 ```
 node main.js -clean d:/myproject/assets d:/out.txt
 ```
-查找结果将会输出到`d:\out.txt`文件。
+查找结果将会输出到`d:/out.txt`文件。
 
 2）按类型统计assets目录下所有原始资源，命令行输入：
 ```
@@ -51,7 +51,7 @@ node main.js -size d:/myproject/assets d:/out.txt
 ```
 node main.js -size d:/myproject/build/web-mobile d:/out.txt
 ```
-查找结果输出到`d:\out.txt`文件。
+查找结果输出到`d:/out.txt`文件。
 
 ## QA
 #### 1、AssetCleaner会自动清除文件吗？
