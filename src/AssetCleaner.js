@@ -61,7 +61,7 @@ let AssetCleaner = {
             content += '空间=' + Utils.byte2KbStr(file.size) + 'KB, 文件=' + file.path + '\n';
             totalSize += file.size;
         }
-        outStr += ', 总空间=' + Utils.byte2MbStr(totalSize) + 'MB, 目录=' + srcDir + '\n\n';
+        outStr += ', 占用空间=' + Utils.byte2MbStr(totalSize) + 'MB, 目录=' + srcDir + '\n\n';
         outStr += content;
 
         return outStr;

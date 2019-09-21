@@ -68,7 +68,7 @@ let AssetSize = {
         // 输出汇总
         for (let i = 0, len = allTypes.length; i < len; i++) {
             let data = allTypes[i];
-            content += '类型=' + data.ext + ', 个数=' + data.count + ', 预计空间=' + data.size + 'MB\n';
+            content += '类型=' + data.ext + ', 个数=' + data.count + ', 占用空间=' + data.size + 'MB\n';
             allSize += data.size;
         }
 

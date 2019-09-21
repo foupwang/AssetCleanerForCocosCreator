@@ -7,17 +7,17 @@
 const AssetCleaner = require('./AssetCleaner');
 const AssetSize = require('./AssetSize');
 
-let option = process.argv[2];
+let command = process.argv[2];
 let sourceFile = process.argv[3];
 let destFile = process.argv[4];
 
-let parseOptions = function(type) {
-    if (!type || type.length <= 0) {
-        console.error('main: type is invalid');
+let parseCommand = function(cmd) {
+    if (!cmd || cmd.length <= 0) {
+        console.error('main: command is invalid');
         return;
     }
 
-    switch (type) {
+    switch (cmd) {
         case '-clean':
             AssetCleaner.start(sourceFile, destFile);
             break;
@@ -25,10 +25,14 @@ let parseOptions = function(type) {
             AssetSize.start(sourceFile, destFile);
             break;
         default:
-            console.log('main: invalid options');
+            let strHelp = 'Usage: node main.js <command>\n'+
+                        'Examples:\n' +
+                        '  node main.js -clean d:/myproject/assets d:/out.txt\n' +
+                        '  node main.js -size d:/myproject/assets d:/out.txt';
+            console.log(strHelp);
             break;
     }
 
 };
 
-parseOptions(option);
+parseCommand(command);
