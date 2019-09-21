@@ -10,7 +10,9 @@
 **支持以下文件类型**
 
   1）.png/.jpg/.webp（包括普通图片、图集、Spine、DragonBone、艺术数字）
+  
   2）.prefab
+  
   3）.anim
 
 *下图为CocosCreator 2.1.2官方Demo查找结果*
@@ -20,6 +22,7 @@
 
 *下图为CocosCreator 2.1.2官方Demo原始资源统计结果*
 ![](http://47.104.72.146/wp-content/uploads/2019/09/size1.png)
+
 *下图为CocosCreator 2.1.2官方Demo构建后资源统计结果*
 ![](http://47.104.72.146/wp-content/uploads/2019/09/size2.png)
 ## AssetCleaner使用：
