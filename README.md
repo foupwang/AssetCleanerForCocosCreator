@@ -8,9 +8,9 @@ Asset cleaner for CocosCreator(CocosCreator资源优化大师)
 ## AssetCleaner功能
 - 自动查找CocosCreator工程中未引用的资源，并把所有未引用资源信息输出到指定文件，方便自己核对无误后删除。
 支持查找以下类型：
- - .png/.jpg/.webp（包括普通图片、图集、Spine、DragonBone、艺术数字）
- - .prefab
- - .anim
+ 1）.png/.jpg/.webp（包括普通图片、图集、Spine、DragonBone、艺术数字）
+ 2）.prefab
+ 3）.anim
 - 统计指定目录下所有文件信息，并按类型区分输出到指定文件，方便后续分析做重点优化
 
 ## AssetCleaner使用示例：
@@ -21,11 +21,13 @@ node main.js -clean 工程资源目录 结果输出文件  	// 查找未引用�
 node main.js -size 工程资源目录 结果输出文件	// 按类型统计目录下所有文件从大到小排序
 ```
 例如，Creator工程路径是`d:\myproject`。
+
 1）要查找未引用资源，则在脚本目录的命令行输入：
 ```
 node main.js -clean d:\myproject\assets d:\out.txt
 ```
 查找结果将会输出到`d:\out.txt`文件。
+
 2）按类型统计assets目录下所有文件，则输入：
 ```
 node main.js -size d:\myproject\assets d:\out.txt
@@ -33,9 +35,9 @@ node main.js -size d:\myproject\assets d:\out.txt
 查找结果输出到`d:\out.txt`文件。
 
 ## QA
-1、AssetCleaner会自动清除文件吗？
+#### 1、AssetCleaner会自动清除文件吗？
 不会，AssetCleaner只是分析并把统计结果输出到文件，实际删除需自己人工操作。
-2、AssetCleaner为什么不做成Creator插件？
+#### 2、AssetCleaner为什么不做成Creator插件？
 原因：1）命令行可以更好的结合自动化流程；2）我喜欢Node.js的简洁轻快；
 
 备注：
