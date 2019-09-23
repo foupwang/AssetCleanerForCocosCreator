@@ -1,5 +1,6 @@
 # AssetCleanerForCocosCreator
 **简介：一个Node.js脚本，自动化列出工程里有哪些资源可删除，从而帮助减小包体。**
+
 开源代码地址：[https://github.com/foupwang/AssetCleanerForCocosCreator](https://github.com/foupwang/AssetCleanerForCocosCreator)
 ## 为什么需要AssetCleaner
 - 随着产品功能增加、版本迭代、需求变更，CocosCreator工程里的资源越来越臃肿，其中有不少不再使用或未及时删除的资源（不仅仅是图片，还包括序列帧动画、Spine动画、Prefab等等），如何知道哪些资源是可以删除的？一个个手动查找是不能忍受的。
