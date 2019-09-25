@@ -1,7 +1,9 @@
-# AssetCleanerForCocosCreator
-**简介：一个Node.js脚本，自动化列出工程里有哪些资源可删除，从而帮助减小包体。**
+CocosCreator资源优化工具-AssetCleaner 1.0发布
 
-开源代码地址：[https://github.com/foupwang/AssetCleanerForCocosCreator](https://github.com/foupwang/AssetCleanerForCocosCreator)
+# AssetCleanerForCocosCreator
+**简介：一个Node.js脚本，自动化统计工程里有哪些资源未使用，以及各类型资源的占比情况，从而帮助减小包体。**
+代码地址：[https://github.com/foupwang/AssetCleanerForCocosCreator](https://github.com/foupwang/AssetCleanerForCocosCreator)
+
 ## 为什么需要AssetCleaner
 - 随着产品功能增加、版本迭代、需求变更，CocosCreator工程里的资源越来越臃肿，其中有不少不再使用或未及时删除的资源（不仅仅是图片，还包括序列帧动画、Spine动画、Prefab等等），如何知道哪些资源是可以删除的？一个个手动查找是不能忍受的。
 - 产品上线前，优化包体大小是不可避免的问题，包体里究竟有什么资源？哪些资源最占空间？它们的分布比例怎样？
@@ -17,15 +19,15 @@
   
   3）.anim
 
-*下图为CocosCreator 2.1.2官方Demo查找结果*
+*下图为查找未引用资源的输出示例*
 ![](http://47.104.72.146/wp-content/uploads/2019/09/clean.png)
 
 - 统计指定目录下所有文件信息，并按类型区分从大到小输出到指定文件，方便后续分析做重点优化。
 
-*下图为CocosCreator 2.1.2官方Demo原始资源统计结果*
+*下图为统计assets原始资源的输出示例*
 ![](http://47.104.72.146/wp-content/uploads/2019/09/size1.png)
 
-*下图为CocosCreator 2.1.2官方Demo构建后资源统计结果*
+*下图为统计构建后资源web-mobile的输出示例*
 ![](http://47.104.72.146/wp-content/uploads/2019/09/size2.png)
 ## AssetCleaner使用：
 `AssetCleaner`基于`Node.js`开发，所以需要先安装`Node.js`，我的测试环境是：`Node.js 10.14.2 + Win10 + CocosCreator 2.1.2`。

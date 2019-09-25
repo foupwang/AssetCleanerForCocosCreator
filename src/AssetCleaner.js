@@ -10,7 +10,8 @@ let ResType = {
     Anim: 3, // 动画文件
     Spine: 4, // Spine
     Prefab: 5, // prefab
-    Fire: 6, // 场景文件 
+    Fire: 6, // 场景文件
+    Code: 7, // js代码 
 };
 
 let ResExt = [
@@ -38,29 +39,42 @@ let AssetCleaner = {
         destFile = FileHelper.getFullPath(destFile);
 
         this.lookupAssetDir(sourceFile);
-        let files = this.compareAssets();
-        let outStr = this.getSortedResult(files, sourceFile);
+        let outMap = this.compareAssets();
+        let outStr = this.getSortedResult(outMap, sourceFile);
         FileHelper.writeFile(destFile, outStr);
     },
 
-    getSortedResult(files, srcDir) {
-        let outStr = '未引用文件数量=' + files.length;
-        if (files.length <= 0) {
+    getSortedResult(outMap, srcDir) {
+        let outStr = '未引用文件数量=';
+        if (outMap.size <= 0) {
             return outStr;
         }
 
-        // 按从大到小排列
-        files.sort(function(a, b) {
-            return b.size - a.size;
-        });
-
+        let totalCount = 0;
         let totalSize = 0;
         let content = '';
-        for (let i = 0, len = files.length; i < len; i++) {
-            let file = files[i];
-            content += '空间=' + Utils.byte2KbStr(file.size) + 'KB, 文件=' + file.path + '\n';
-            totalSize += file.size;
+
+        for (let [type, files] of outMap.entries()) {
+            if (files.length <= 0) {
+                continue;
+            }
+    
+            // 按从大到小排列
+            files.sort(function(a, b) {
+                return b.size - a.size;
+            });
+    
+            for (let i = 0, len = files.length; i < len; i++) {
+                let file = files[i];
+                content += '空间=' + Utils.byte2KbStr(file.size) + 'KB, 文件=' + file.path + '\n';
+                totalSize += file.size;
+            }
+
+            totalCount += files.length;
+            content += '\n';
         }
+        
+        outStr += totalCount;
         outStr += ', 占用空间=' + Utils.byte2MbStr(totalSize) + 'MB, 目录=' + srcDir + '\n\n';
         outStr += content;
 
@@ -69,7 +83,7 @@ let AssetCleaner = {
 
     // UUID和文件逐个比较，返回结果汇总
     compareAssets() {
-        let results = [];
+        let outMap = new Map();
         
         // 如果源UUID在所有目标资源都未找到，则说明源UUID对应的文件未被引用
         for (let [srcPath, srcData] of this.sourceMap.entries()) {
@@ -87,17 +101,27 @@ let AssetCleaner = {
                         }
                     }
                 }
+                if (!!srcData && !!srcData.name && srcData.name.length > 0) {
+                    if (destData.data.indexOf(srcData.name) >= 0) {
+                        bFound = true;
+                    }
+                }
                 if (bFound) {
                     break; // 源文件只要被一个目标文件引用，即代表源文件被引用了，无需再和之后的目标文件比较
                 }
             }
 
             if (!bFound) {
-                results.push({ path:srcPath, size:srcData.size }); 
+                let files = outMap.get(srcData.type);
+                if (!files) {
+                    files = [];
+                    outMap.set(srcData.type, files);
+                }
+                files.push({ path:srcPath, size:srcData.size });
             }
         }
 
-        return results;
+        return outMap;
     },
 
     // 递归查找指定目录下所有资源
@@ -113,9 +137,9 @@ let AssetCleaner = {
             let curPath = path.join(srcDir, file);
 
             // 暂时排除src目录
-            if (curPath.indexOf('\\src\\') >= 0) {
-                continue;
-            }
+            // if (curPath.indexOf('\\src\\') >= 0) {
+            //     continue;
+            // }
             // 如果该文件已处理过则直接跳过
             if (this.handleMap.has(curPath)) {
                 continue;
@@ -132,11 +156,19 @@ let AssetCleaner = {
             let pathObj = path.parse(curPath);
             // 针对各类型文件做相应处理
             switch (pathObj.ext) {
+                case '.js':
+                    data = FileHelper.getFileString(curPath);
+                    this.destMap.set(curPath, { data });
+                    break;
+
                 case '.prefab':
-                    if (curPath.indexOf('\\res\\') >= 0) {
-                        uuid = this.getFileUUID(curPath, pathObj, ResType.Prefab);
-                        this.sourceMap.set(curPath, { uuid, size:stats.size });
+                    uuid = this.getFileUUID(curPath, pathObj, ResType.Prefab);
+                    data = { uuid, type:ResType.Prefab, size:stats.size };
+                    if (curPath.indexOf('\\resources\\') >= 0) {
+                        data.name = pathObj.name; // resources还需记录文件名
                     }
+                    this.sourceMap.set(curPath, data);
+                    
                     data = FileHelper.getFileString(curPath);
                     this.destMap.set(curPath, { data });
                     break;
@@ -144,7 +176,7 @@ let AssetCleaner = {
                 case '.anim':
                     if (curPath.indexOf('\\res\\') >= 0) {
                         uuid = this.getFileUUID(curPath, pathObj, ResType.Anim);
-                        this.sourceMap.set(curPath, { uuid, size:stats.size });
+                        this.sourceMap.set(curPath, { uuid, type:ResType.Anim, size:stats.size });
                     }
                     data = FileHelper.getFileString(curPath);
                     this.destMap.set(curPath, { data });
@@ -163,7 +195,7 @@ let AssetCleaner = {
                     }
                     let type = this.getImageType(curPath, pathObj);
                     uuid = this.getFileUUID(curPath, pathObj, type);
-                    this.sourceMap.set(curPath, { uuid, size:stats.size });
+                    this.sourceMap.set(curPath, { uuid, type:type, size:stats.size });
                     break;
 
                 default:
@@ -260,6 +292,9 @@ let AssetCleaner = {
             case ResType.Prefab:
                 destPath = srcPath + '.meta';
                 uuid = this.getRawUUIDFromMeta(destPath);
+                break;
+            case ResType.Code:
+                uuid.push(pathObj.name);
                 break;
             default:
                 break;
