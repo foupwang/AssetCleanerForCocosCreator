@@ -69,4 +69,6 @@ node main.js -size d:/myproject/build/web-mobile d:/out.txt
 #### 3、`AssetCleaner`的局限
 查找未使用资源的功能，目前主要适用于非resources目录。对于resources目录，因为原则上resources目录只存放动态加载资源，而动态加载的资源名在代码里多数情况下是变量，暂时没找到有效匹配方案，所以目前只是试验性地支持resources目录的.prefab类型（完全匹配）。期待技术大佬们加入这个开源项目，一起完善它。
 
-欢迎关注我的微信公众号“楚游香”，做进一步的技术交流。
+## 交流
+欢迎关注微信公众号“楚游香”，做进一步的技术交流。
+![](http://47.104.72.146/wp-content/uploads/2019/09/qrcode_for_gh_d08d74db5b82_258.jpg)
