@@ -49,10 +49,6 @@ let AssetCleaner = {
     },
 
     getSortedResult(outStr, outMap, srcDir) {
-        if (outMap.size <= 0) {
-            return outStr;
-        }
-
         let totalCount = 0;
         let totalSize = 0;
         let content = '';
@@ -194,6 +190,7 @@ let AssetCleaner = {
             // 针对各类型文件做相应处理
             switch (pathObj.ext) {
                 case '.js':
+                case '.ts':
                     data = FileHelper.getFileString(curPath);
                     this.destMap.set(curPath, { data, type:ResType.Code });
                     break;
@@ -202,7 +199,7 @@ let AssetCleaner = {
                     uuid = this.getFileUUID(curPath, pathObj, ResType.Prefab);
                     data = { uuid, type:ResType.Prefab, size:stats.size, name:'' };
                     if (curPath.indexOf('\\resources\\') >= 0) {
-                        data.name = pathObj.name; // resources还需记录文件名
+                        data.name = pathObj.name; // resources下文件需按文件名在代码中查找
                     }
                     this.sourceMap.set(curPath, data);
                     
@@ -211,10 +208,11 @@ let AssetCleaner = {
                     break;
 
                 case '.anim':
-                    if (curPath.indexOf('\\res\\') >= 0) {
+                    if (curPath.indexOf('\\resources\\') < 0) { // 暂时排除resources下.anim
                         uuid = this.getFileUUID(curPath, pathObj, ResType.Anim);
                         this.sourceMap.set(curPath, { uuid, type:ResType.Anim, size:stats.size });
                     }
+
                     data = FileHelper.getFileString(curPath);
                     this.destMap.set(curPath, { data, type:ResType.Anim });
                     break;
@@ -227,7 +225,7 @@ let AssetCleaner = {
                 case '.png':
                 case '.jpg':
                 case '.webp':
-                    if (curPath.indexOf('\\resources\\') >= 0) {
+                    if (curPath.indexOf('\\resources\\') >= 0) { // 暂时不处理resources下图片
                         break;
                     }
                     let type = this.getImageType(curPath, pathObj);
