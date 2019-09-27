@@ -1,5 +1,5 @@
 # AssetCleanerForCocosCreator
-**简介：一个适用于CocosCreator引擎的Node.js脚本，自动化统计工程里有哪些资源未使用，以及各类型资源的占比情况，从而帮助减小包体。**
+**简介：一个基于Node.js的CocosCreator项目资源优化工具，自动化统计有哪些资源未使用，以及各类型资源的占比情况，从而帮助减小包体。**
 
 代码地址：[https://github.com/foupwang/AssetCleanerForCocosCreator](https://github.com/foupwang/AssetCleanerForCocosCreator)
 
@@ -8,10 +8,10 @@
 - 产品上线前，优化包体大小是不可避免的问题，包体里究竟有什么资源？哪些资源最占空间？它们的分布比例怎样？
 **`AssetCleaner`为解决以上CocosCreator资源问题而生**
 ## AssetCleaner功能
-- **查找未使用资源。**自动查找assets目录下所有未引用的资源，并把结果输出到指定文件，方便开发者核对无误后删除。
-- **分析包体。**自动统计指定目录下所有文件信息，并按类型区分从大到小输出到指定文件，方便后续分析做重点优化。
-- **资源优化。**自动统计resources目录下非动态加载的资源，开发者核对后可移动到非resources目录。
-> CocosCreator官方建议：非代码动态加载的资源不要放在resources目录，否则会增大包体和settings.js大小，且未用到资源无法在构建过程中自动剔除。
+- 查找未使用资源。自动查找assets目录下所有未引用的资源，并把结果输出到指定文件，方便开发者核对无误后删除。
+- 分析包体。自动统计指定目录下所有文件信息，并按类型区分从大到小输出到指定文件，方便后续分析做重点优化。
+- 资源优化。自动统计resources目录下非动态加载的资源，开发者核对后可移动到非resources目录。
+> CocosCreator官方建议：非动态加载的资源不要放在resources目录，否则会增大包体和settings.js大小，且未用到资源无法在构建过程中自动剔除。
 
 **支持以下文件类型**
 
@@ -39,9 +39,9 @@
 node main.js -clean 工程资源目录 结果输出文件  	// 查找未使用资源
 node main.js -size 工程资源目录 结果输出文件	// 按类型统计目录下所有文件从大到小排序
 ```
-例如，CocosCreator工程路径是`d:/myproject`。
+例如，CocosCreator工程路径是`d:/myproject`，则进入AssetCleaner的脚本代码目录。
 
-1）查找未使用资源。进入脚本代码目录，命令行输入：
+1）查找未使用资源。命令行输入：
 ```
 node main.js -clean d:/myproject/assets d:/out.txt
 ```
