@@ -147,7 +147,7 @@ let AssetCleaner = {
             return bFound;
         }
         for (let [destPath, destData] of this.destMap.entries()) {
-            // 目标资源必须是.js代码
+            // 目标资源必须是代码文件
             if (srcPath == destPath || ResType.Code !== destData.type) { 
                 continue;
             }

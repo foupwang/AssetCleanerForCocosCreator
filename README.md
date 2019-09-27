@@ -1,7 +1,6 @@
-CocosCreator资源优化工具-AssetCleaner 1.1更新啦
-
 # AssetCleanerForCocosCreator
 **简介：一个Node.js脚本，自动化统计工程里有哪些资源未使用，以及各类型资源的占比情况，从而帮助减小包体。**
+
 代码地址：[https://github.com/foupwang/AssetCleanerForCocosCreator](https://github.com/foupwang/AssetCleanerForCocosCreator)
 
 ## 为什么需要AssetCleaner
@@ -9,9 +8,10 @@ CocosCreator资源优化工具-AssetCleaner 1.1更新啦
 - 产品上线前，优化包体大小是不可避免的问题，包体里究竟有什么资源？哪些资源最占空间？它们的分布比例怎样？
 **`AssetCleaner`为解决以上CocosCreator资源问题而生**
 ## AssetCleaner功能
-- 查找未使用资源。自动查找CocosCreator工程中所有未引用的资源，并把结果输出到指定文件，方便开发者核对无误后删除。
+- 查找未使用资源。自动查找assets目录下所有未引用的资源，并把结果输出到指定文件，方便开发者核对无误后删除。
 - 分析包体。自动统计指定目录下所有文件信息，并按类型区分从大到小输出到指定文件，方便后续分析做重点优化。
-- 资源优化。自动统计resources目录下非动态加载的资源，开发者可确认后移动到非resources目录。（CocosCreator官方建议，非代码动态加载的资源不要放在resources目录，否则会增大包体和settings.js大小）
+- 资源优化。自动统计resources目录下非动态加载的资源，开发者核对后可移动到非resources目录。
+> CocosCreator官方建议，非代码动态加载的资源不要放在resources目录，否则会增大包体和settings.js大小
 
 **支持以下文件类型**
 
@@ -31,7 +31,7 @@ CocosCreator资源优化工具-AssetCleaner 1.1更新啦
 
 *下图为统计构建后资源web-mobile的输出示例*
 ![](http://47.104.72.146/wp-content/uploads/2019/09/size2.png)
-## AssetCleaner使用：
+## AssetCleaner使用
 `AssetCleaner`基于`Node.js`开发，所以需要先安装`Node.js`，我的测试环境是：`Node.js 10.14.2 + Win10 + CocosCreator 2.1.2`。
 
 目前支持以下两种命令
@@ -67,4 +67,4 @@ node main.js -size d:/myproject/build/web-mobile d:/out.txt
 #### 3、`AssetCleaner`的局限
 查找未使用资源的功能，目前适用于非resources目录。对于resources目录，因为原则上resources目录只存放动态加载资源，而动态加载的资源名在代码里多数情况下是变量，暂时没找到有效匹配方案，所以目前只是试验性地支持resources目录下的.prefab类型（完全匹配）。期待有技术大佬能够参与到这个开源项目里，一起完善它。
 
-也欢迎大家关注我的微信公众号“楚游香”，做进一步的技术交流。
+欢迎关注我的微信公众号“楚游香”，做进一步的技术交流。
