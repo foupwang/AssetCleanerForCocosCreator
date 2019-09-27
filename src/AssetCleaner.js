@@ -24,6 +24,7 @@ let AssetCleaner = {
     sourceMap: null,
     destMap: null,
     handleMap: null,
+    resourcesDir: 'resources',
 
     start(sourceFile, destFile) {
         if (!sourceFile || sourceFile.length <= 0 || !destFile || destFile.length <= 0) {
@@ -34,6 +35,7 @@ let AssetCleaner = {
         this.sourceMap = new Map();
         this.destMap = new Map();
         this.handleMap = new Map();
+        this.resourcesDir = path.join('/', this.resourcesDir, '/');
 
         sourceFile = FileHelper.getFullPath(sourceFile);
         destFile = FileHelper.getFullPath(destFile);
@@ -89,7 +91,7 @@ let AssetCleaner = {
         for (let [srcPath, srcData] of this.sourceMap.entries()) {
             let isBind = false;
             let isCodeLoad = false;
-            let bDynamic = (srcPath.indexOf('\\resources\\') >= 0);
+            let bDynamic = (srcPath.indexOf(this.resourcesDir) >= 0);
             
             isBind = this.findAssetByUUID(srcPath, srcData);
             if (bDynamic) {
@@ -198,7 +200,7 @@ let AssetCleaner = {
                 case '.prefab':
                     uuid = this.getFileUUID(curPath, pathObj, ResType.Prefab);
                     data = { uuid, type:ResType.Prefab, size:stats.size, name:'' };
-                    if (curPath.indexOf('\\resources\\') >= 0) {
+                    if (curPath.indexOf(this.resourcesDir) >= 0) {
                         data.name = pathObj.name; // resources下文件需按文件名在代码中查找
                     }
                     this.sourceMap.set(curPath, data);
@@ -208,7 +210,7 @@ let AssetCleaner = {
                     break;
 
                 case '.anim':
-                    if (curPath.indexOf('\\resources\\') < 0) { // 暂时排除resources下.anim
+                    if (curPath.indexOf(this.resourcesDir) < 0) { // 暂时排除resources下.anim
                         uuid = this.getFileUUID(curPath, pathObj, ResType.Anim);
                         this.sourceMap.set(curPath, { uuid, type:ResType.Anim, size:stats.size });
                     }
@@ -225,7 +227,7 @@ let AssetCleaner = {
                 case '.png':
                 case '.jpg':
                 case '.webp':
-                    if (curPath.indexOf('\\resources\\') >= 0) { // 暂时不处理resources下图片
+                    if (curPath.indexOf(this.resourcesDir) >= 0) { // 暂时不处理resources下图片
                         break;
                     }
                     let type = this.getImageType(curPath, pathObj);
