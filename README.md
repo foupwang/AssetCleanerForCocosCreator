@@ -36,10 +36,10 @@
 
 目前支持以下两种命令
 ```
-node main.js -clean 工程资源目录 结果输出文件  	// 查找未使用资源
-node main.js -size 工程资源目录 结果输出文件	// 按类型统计目录下所有文件从大到小排序
+node main.js -clean 项目资源目录 结果输出文件  	// 查找未使用资源
+node main.js -size 项目资源目录 结果输出文件	// 按类型统计目录下所有文件从大到小排序
 ```
-例如，CocosCreator工程路径是`d:/myproject`，则进入AssetCleaner的脚本代码目录。
+例如，CocosCreator项目路径是`d:/myproject`，则进入AssetCleaner的脚本代码目录。
 
 1）查找未使用资源。命令行输入：
 ```
@@ -65,6 +65,6 @@ node main.js -size d:/myproject/build/web-mobile d:/out.txt
 #### 2、`AssetCleaner`为什么不做成Creator插件？
 命令行可以更好的结合自动化构建流程，便于拓展。
 #### 3、`AssetCleaner`的局限
-查找未使用资源的功能，目前适用于非resources目录。对于resources目录，因为原则上resources目录只存放动态加载资源，而动态加载的资源名在代码里多数情况下是变量，暂时没找到有效匹配方案，所以目前只是试验性地支持resources目录下的.prefab类型（完全匹配）。期待有技术大佬能加入到这个开源项目里，一起完善它。
+查找未使用资源的功能，目前主要适用于非resources目录。对于resources目录，因为原则上resources目录只存放动态加载资源，而动态加载的资源名在代码里多数情况下是变量，暂时没找到有效匹配方案，所以目前只是试验性地支持resources目录的.prefab类型（完全匹配）。期待有技术大佬能加入到这个开源项目里，一起完善它。
 
 欢迎关注我的微信公众号“楚游香”，做进一步的技术交流。
