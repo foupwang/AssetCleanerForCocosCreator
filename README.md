@@ -1,5 +1,5 @@
 # AssetCleanerForCocosCreator
-**简介：一个基于Node.js的CocosCreator项目资源优化工具，自动化统计有哪些资源未使用，以及各类型资源的占比情况，从而帮助减小包体。**
+**简介：一个基于Node.js的CocosCreator项目资源清理工具，自动化统计有哪些资源未使用，以及各类型资源的占比情况，从而帮助减小包体。**
 
 代码地址：[https://github.com/foupwang/AssetCleanerForCocosCreator](https://github.com/foupwang/AssetCleanerForCocosCreator)
 
