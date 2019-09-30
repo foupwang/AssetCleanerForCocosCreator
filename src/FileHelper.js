@@ -1,7 +1,17 @@
 ﻿const fs = require('fs');
 const path = require('path');
+// const images = require('images');
 
 let FileHelper = {
+
+    // 返回图片占用内存(width*height*4)
+    getImageMem(filePath, ext) {
+        let memBytes = 0;
+        // if ('.png' === ext || '.jpg' === ext || '.webp' === ext) {
+        //     memBytes = images(filePath).width() * images(filePath).height() * 4;
+        // }
+        return memBytes;
+    },
 
     getFullPath(filePath) {
         if (!path.isAbsolute(filePath)) {

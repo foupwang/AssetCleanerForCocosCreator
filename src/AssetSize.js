@@ -46,7 +46,8 @@ let AssetSize = {
                 value = new Map();
                 this.fileMap.set(pathObj.ext, value);
             }
-            value.set(curPath, { size:stats.size, path:curPath });
+            let memBytes = FileHelper.getImageMem(curPath, pathObj.ext);
+            value.set(curPath, { path:curPath, size:stats.size, memBytes });
         }
     },
 
@@ -54,8 +55,8 @@ let AssetSize = {
         let allTypes = [];
         
         fileMap.forEach((files, ext) => {
-            let { totalSize, outStr } = this.formatByByte(files);
-            allTypes.push({ size:parseFloat(totalSize), ext, count:files.size, outStr });
+            let { totalSize, totalMem, outStr } = this.formatByByte(files);
+            allTypes.push({ size:parseFloat(totalSize), mem:parseFloat(totalMem), ext, count:files.size, outStr });
         });
         
         allTypes.sort(function(a, b) {
@@ -68,7 +69,11 @@ let AssetSize = {
         // 输出汇总
         for (let i = 0, len = allTypes.length; i < len; i++) {
             let data = allTypes[i];
-            content += '类型=' + data.ext + ', 个数=' + data.count + ', 占用空间=' + data.size + 'MB\n';
+            content += '类型=' + data.ext + ', 个数=' + data.count + ', 占用空间=' + data.size + 'MB';
+            if (data.mem > 0) {
+                content += ', 预计内存=' + data.mem + 'MB';
+            }
+            content += '\n';
             allSize += data.size;
         }
 
@@ -87,10 +92,12 @@ let AssetSize = {
     // 格式化为从大到小按MB表示
     formatByByte(files) {
         let totalSize = 0;
+        let totalMem = 0;
         let newFiles = [];
 
         files.forEach(function(file, path) {
             totalSize += file.size;
+            totalMem += file.memBytes;
             newFiles.push(file);
         });
 
@@ -102,11 +109,16 @@ let AssetSize = {
         let outStr = '';
         for (let i = 0, len = newFiles.length; i < len; i++) {
             let file = newFiles[i];
-            outStr += '空间=' + Utils.byte2KbStr(file.size) + 'KB, 文件=' + file.path + '\n';
+            outStr += '空间=' + Utils.byte2KbStr(file.size) + 'KB, 文件=' + file.path;
+            if (file.memBytes > 0) {
+                outStr += ', 内存=' + Utils.byte2MbStr(file.memBytes) + 'MB';
+            }
+            outStr += '\n';
         }
 
         totalSize = Utils.byte2MbStr(totalSize);
-        return { totalSize, outStr };
+        totalMem = Utils.byte2MbStr(totalMem);
+        return { totalSize, totalMem, outStr };
     },
 
 };
