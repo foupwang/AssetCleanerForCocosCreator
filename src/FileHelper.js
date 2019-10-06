@@ -62,6 +62,14 @@ let FileHelper = {
         return fs.readFileSync(fullPath).toString();
     },
 
+    // 函数防抖
+    debounce(fn, wait = 1000) {
+        var timeout = null;
+        return function() {
+            timeout && clearTimeout(timeout);
+            timeout = setTimeout(fn, wait);
+        }
+    }
 };
 
 module.exports = FileHelper;

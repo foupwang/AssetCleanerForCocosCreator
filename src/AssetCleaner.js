@@ -12,10 +12,12 @@ let ResType = {
     Prefab: 5, // prefab
     Fire: 6, // 场景文件
     Code: 7, // js代码 
+    Fnt: 8 // 位图
 };
 
 let ResExt = [
     { name:'.plist', type:ResType.ImageAtlas },
+    { name:'.fnt', type:ResType.Fnt },
     { name:'.labelatlas', type:ResType.LabelAtlas },
     { name:'.json', type:ResType.Spine }, // spine和dragonBones的扩展名、查找流程一样
 ];
@@ -43,18 +45,43 @@ let AssetCleaner = {
         this.lookupAssetDir(sourceFile);
         let { noBindMap, noLoadMap } = this.compareAssets();
         let outStr1 = '未引用文件数量=';
-        outStr1 = this.getSortedResult(outStr1, noBindMap, sourceFile);
+        outStr1 = this.getSortedResult(outStr1, noBindMap, sourceFile, global._delete);
         let outStr2 = '非动态调用(无需放在resources下)文件数量=';
         outStr2 = this.getSortedResult(outStr2, noLoadMap, sourceFile);
         let outStr = outStr1 + '\n' + outStr2;
         FileHelper.writeFile(destFile, outStr);
     },
 
-    getSortedResult(outStr, outMap, srcDir) {
+    getSortedResult(outStr, outMap, srcDir, isDelete) {
         let totalCount = 0;
         let totalSize = 0;
         let content = '';
-
+        const exclude = global._excludes && new RegExp(global._excludes, 'gi')
+        let fileCount = 0;
+        let metaFileCount = 0;
+        let cleanContent = '';
+        let cleanFlag = false
+        /**
+         * 清除所有无用资源后生成删除日志
+         */
+        const fileCountHandle = FileHelper.debounce(() => {
+            const printText = `共删除${fileCount}个原始资源\n`
+            cleanContent = printText + cleanContent
+            if (cleanFlag) {
+                FileHelper.writeFile(srcDir + '\\cleanFiles.txt', cleanContent);
+            } else {
+                cleanFlag = true
+            }
+        })
+        const metaFileCountHandle = FileHelper.debounce(() => {
+            const printText = `共删除${metaFileCount}个meta资源\n`
+            cleanContent = printText + cleanContent
+            if (cleanFlag) {
+                FileHelper.writeFile(srcDir + '\\cleanFiles.txt', cleanContent);
+            } else {
+                cleanFlag = true
+            }
+        })
         for (let [type, files] of outMap.entries()) {
             if (files.length <= 0) {
                 continue;
@@ -69,6 +96,23 @@ let AssetCleaner = {
                 let file = files[i];
                 content += '空间=' + Utils.byte2KbStr(file.size) + 'KB, 文件=' + file.path + '\n';
                 totalSize += file.size;
+                const isExcludes = exclude && file.path.search(exclude) !== -1
+                const isResourcesDir = file.path.includes(this.resourcesDir)
+                // 有删除参数（-d）时，非resources目录，非排除类文件，会自动删除
+                if (isDelete && !isResourcesDir && !isExcludes) {
+                    fs.unlink(file.path, err => {
+                        if (err) return console.error(err.message);
+                        cleanContent += file.path + '\n'
+                        fileCount++;
+                        fileCountHandle();
+                    })
+                    fs.unlink(file.path + '.meta', err => {
+                        if (err) return console.warn(err.message);
+                        cleanContent += file.path + '.meta\n'
+                        metaFileCount++;
+                        metaFileCountHandle();
+                    })
+                }
             }
 
             totalCount += files.length;
@@ -78,7 +122,9 @@ let AssetCleaner = {
         outStr += totalCount;
         outStr += ', 占用空间=' + Utils.byte2MbStr(totalSize) + 'MB, 目录=' + srcDir + '\n\n';
         outStr += content;
-
+        if (isDelete && content) {
+            outStr += `\n如果终端未显示错误，则未引用文件已全部删除(包含meta文件，不包含排除文件)\n`;
+        }
         return outStr;
     },
 
@@ -189,6 +235,12 @@ let AssetCleaner = {
             let data = null;
             let uuid = [];
             let pathObj = path.parse(curPath);
+            // Sprine资源
+            if (curPath.includes('.json.meta')) {
+                data = FileHelper.getFileString(curPath);
+                this.destMap.set(curPath, { data, type: ResType.Spine });
+                continue
+            }
             // 针对各类型文件做相应处理
             switch (pathObj.ext) {
                 case '.js':
@@ -223,7 +275,7 @@ let AssetCleaner = {
                     data = FileHelper.getFileString(curPath);
                     this.destMap.set(curPath, { data, type:ResType.Fire });
                     break;
-                
+                    
                 case '.png':
                 case '.jpg':
                 case '.webp':
@@ -232,7 +284,7 @@ let AssetCleaner = {
                     }
                     let type = this.getImageType(curPath, pathObj);
                     uuid = this.getFileUUID(curPath, pathObj, type);
-                    this.sourceMap.set(curPath, { uuid, type:type, size:stats.size });
+                    type === ResType.Image && this.sourceMap.set(curPath, { uuid, type:type, size:stats.size });
                     break;
 
                 default:
@@ -241,7 +293,7 @@ let AssetCleaner = {
         }
     },
 
-    // 根据同一目录下该图片同名文件的不同扩展名来判断图片类型（.plist、.json、labelatlas）
+    // 根据同一目录下该图片同名文件的不同扩展名来判断图片类型（.plist、.json、labelatlas、fnt）
     getImageType(srcPath, pathObj) {
         let type = ResType.Image;
         for (let i = 0, len = ResExt.length; i < len; i++) {
@@ -249,7 +301,7 @@ let AssetCleaner = {
             let testPath = path.join(pathObj.dir, pathObj.name) + ext.name;
             if (fs.existsSync(testPath)) {
                 type = ext.type;
-                this.handleMap.set(testPath, { handled:true });
+                this.handleMap.set(srcPath, { handled:true });
                 break;
             }
         }
@@ -308,7 +360,8 @@ let AssetCleaner = {
         switch(type) {
             case ResType.Image:
                 destPath = srcPath + '.meta';
-                uuid = this.getUUIDFromMeta(destPath, pathObj.name);
+                // 当前UUID + 原始UUID，解决Spine动画配置文件与资源文件不同名，或一个Spine动画引用多个图片资源
+                uuid = this.getUUIDFromMeta(destPath, pathObj.name).concat(this.getRawUUIDFromMeta(destPath)); // 当前UUID
                 break;
             case ResType.ImageAtlas:
                 destPath = path.join(pathObj.dir, pathObj.name) + '.plist.meta';
