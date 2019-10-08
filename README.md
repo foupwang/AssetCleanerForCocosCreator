@@ -38,10 +38,10 @@
 ## AssetCleaner使用
 `AssetCleaner`基于`Node.js`开发，所以需要先安装`Node.js`，我的测试环境是：`Node.js 10.14.2 + Win10 + CocosCreator 2.1.2`。
 
-目前支持以下两种命令
+目前支持以下几种命令
 ```
 node main.js -clean 项目资源目录 结果输出文件  	// 查找未使用资源
-node main.js -clean 项目资源目录 结果输出文件	-d // 删除项目中未引用的图片、预制件、动画
+node main.js -clean 项目资源目录 结果输出文件 -d // 查找未使用资源，并且删除项目中未引用的图片、预制件、动画
 node main.js -size 项目资源目录 结果输出文件	// 按类型统计目录下所有文件从大到小排序
 ```
 例如，CocosCreator项目路径是`d:/myproject`，则进入AssetCleaner的脚本代码目录。
@@ -52,13 +52,13 @@ node main.js -clean d:/myproject/assets d:/out.txt
 ```
 查找结果将会输出到`d:/out.txt`文件。
 
-2）查找未使用资源。命令行输入：
+2）查找且自动删除未使用资源（请确保资源已备份）。命令行输入：
 ```
 node main.js -clean d:/myproject/assets d:/out.txt -d
 或者
 node main.js -clean d:/myproject/assets d:/out.txt -delete
 ```
-删除结果默认将会输出到`d:/myproject/assets/cleanFiles.txt`文件。
+查找结果输出到`d:/out.txt`文件，删除结果输出到`d:/myproject/assets/cleanFiles.txt`文件。
 
 3）按类型统计assets目录下所有原始资源。命令行输入：
 ```
