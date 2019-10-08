@@ -52,7 +52,7 @@ node main.js -clean d:/myproject/assets d:/out.txt
 ```
 查找结果将会输出到`d:/out.txt`文件。
 
-2）查找且自动删除未使用资源（请确保资源已备份）。命令行输入：
+2）查找且自动删除未使用资源（谨慎！请确保资源已备份）。命令行输入：
 ```
 node main.js -clean d:/myproject/assets d:/out.txt -d
 或者
@@ -73,8 +73,8 @@ node main.js -size d:/myproject/build/web-mobile d:/out.txt
 查找结果输出到`d:/out.txt`文件。
 
 ## QA
-#### 1、`AssetCleaner`会自动清除文件吗？
-不会。`AssetCleaner`只是分析并把统计结果输出到文件，实际删除需自己手动操作。
+#### 1、`AssetCleaner`会自动删除未使用资源吗？
+默认不会，`AssetCleaner`只是分析并把统计结果输出到文件，实际删除需自己手动操作。也可使用可选命令`-d`删除，详见上面说明。
 #### 2、`AssetCleaner`为什么不做成Creator插件？
 命令行可以更好的结合自动化构建流程，便于拓展。
 #### 3、`AssetCleaner`的局限
