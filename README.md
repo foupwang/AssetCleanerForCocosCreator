@@ -77,7 +77,9 @@ node main.js -size d:/myproject/build/web-mobile d:/out.txt
 默认不会，`AssetCleaner`只是分析并把统计结果输出到文件，实际删除需自己手动操作。也可使用可选命令`-d`删除，详见上面说明。
 #### 2、`AssetCleaner`为什么不做成Creator插件？
 命令行可以更好的结合自动化构建流程，便于拓展。
-#### 3、`AssetCleaner`的局限
+#### 3、为什么有些资源明明是有用的，但也被认为是未引用资源？
+一般是因为资源命名不一致造成的。例如：对于艺术数字类型，如果图片名是font_01.png，则描述文件应是font_01.labelatlas；对于Spine动画，如果图片名是light_01.png，则描述文件应是light_01.atlas和light_01.json。否则该图片可能被认为是未引用。
+#### 4、`AssetCleaner`的局限
 查找未使用资源的功能，目前主要适用于非resources目录。对于resources目录，因为原则上resources目录只存放动态加载资源，而动态加载的资源名在代码里多数情况下是变量，暂时没找到有效匹配方案，所以目前只是试验性地支持resources目录的.prefab类型（完全匹配）。期待技术大佬们加入这个开源项目，一起完善它。
 
 ## 交流
