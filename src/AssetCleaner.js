@@ -284,7 +284,7 @@ let AssetCleaner = {
                     }
                     let type = this.getImageType(curPath, pathObj);
                     uuid = this.getFileUUID(curPath, pathObj, type);
-                    type === ResType.Image && this.sourceMap.set(curPath, { uuid, type:type, size:stats.size });
+                    (type === ResType.Image || type === ResType.ImageAtlas) && this.sourceMap.set(curPath, { uuid, type:type, size:stats.size });
                     break;
 
                 default:
