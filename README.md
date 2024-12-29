@@ -28,13 +28,13 @@
   4）.js/.ts代码
 
 *下图为查找未使用资源的输出示例*
-![](http://47.104.72.146/wp-content/uploads/2019/09/clean.png)
+![](https://www.chuyouxiang.com/wp-content/uploads/2019/09/clean.png)
 
 *下图为统计assets原始资源的输出示例*
-![](http://47.104.72.146/wp-content/uploads/2019/09/size1.png)
+![](https://www.chuyouxiang.com/wp-content/uploads/2019/09/size1.png)
 
 *下图为统计构建后资源web-mobile的输出示例*
-![](http://47.104.72.146/wp-content/uploads/2019/09/size2.png)
+![](https://www.chuyouxiang.com/wp-content/uploads/2019/09/size2.png)
 ## AssetCleaner使用
 `AssetCleaner`基于`Node.js`开发，所以需要先安装`Node.js`，我的测试环境是：`Node.js 10.14.2 + Win10 + CocosCreator 2.1.2`。
 
